@@ -1,66 +1,95 @@
-# GBM Survival–Pathway Analysis
+# GBM Gene Expression and Survival-Associated Pathway Analysis
 
 ## Overview
 
-This project investigates associations between gene expression and survival duration in glioblastoma (GBM) samples using gene-level correlation analysis and pathway-level enrichment analysis.
+This project investigates associations between gene-expression profiles and recorded survival duration in glioblastoma (GBM), using publicly available data from the Gene Expression Omnibus (GEO) dataset GSE149009.
 
-The analysis uses data from the Gene Expression Omnibus (GEO) dataset GSE149009.
+The analysis combines exploratory data analysis, gene-level correlation analysis, and Gene Ontology (GO) Biological Process pathway enrichment to investigate molecular processes associated with variation in recorded survival duration.
 
-## Research Question
+## Research Objectives
 
-Which gene-expression patterns and biological pathways are associated with survival duration among the available GBM samples?
-
-## Methods
-
-1. Matched gene-expression data to clinical metadata using sample identifiers.
-2. Excluded samples with missing survival information from gene–survival correlation analysis.
-3. Calculated Spearman rank correlations between individual gene-expression values and survival days.
-4. Applied Benjamini–Hochberg false-discovery-rate correction.
-5. Ranked genes by signed Spearman correlation.
-6. Mapped Ensembl gene identifiers to human gene symbols and constructed a unique-symbol ranking.
-7. Conducted preranked Gene Set Enrichment Analysis (GSEA) using GO Biological Process gene sets.
-
-The documented analysis settings use GSEApy prerank, 1,000 permutations, random seed 42, and a significance threshold of FDR q-value < 0.05. Package versions will be recorded from the final analysis environment.
-
-## Results
-
-- 68 samples were present in the source cohort.
-- 59 samples had available survival days and were included in gene–survival correlations.
-- 30,617 nonconstant genes were tested.
-- No individual gene passed FDR < 0.05 in the reported gene-level analysis.
-- 2,710 GO Biological Process pathways were tested.
-- 66 pathways passed FDR q-value < 0.05.
-- Of these significant pathways, 59 had positive normalized enrichment scores (NES) and 7 had negative NES.
-
-Leading enriched terms included mitochondrial translation, mitochondrial gene expression, chromatin remodeling, and RNA processing and splicing.
-
-## Interpretation
-
-Positive NES indicates enrichment among genes positively correlated with survival; negative NES indicates enrichment among genes negatively correlated with survival, based on the ranking convention used in this analysis.
-
-These results identify associations and hypotheses for further investigation. They do not establish that any gene or pathway causes longer or shorter survival.
-
-## Limitations
-
-- The gene–survival analysis used a relatively small sample of 59 cases.
-- Nine samples lacked survival data and were excluded from the correlation analysis.
-- The analysis does not establish causality.
-- Potential clinical confounders were not fully adjusted for.
-- Correlation with recorded survival days does not explicitly model censoring as a dedicated survival-analysis method would.
-- Pathway findings require validation using independent data.
-
-## Repository Contents
-
-- `notebooks/`: analysis notebook.
-- `results/gene_survival/`: gene-level association results and ranked gene lists.
-- `results/pathway_analysis/`: complete GSEA results and significant pathway tables.
-- `figures/`: pathway visualisations.
-- `docs/`: detailed research documentation.
-
-## Reproducibility
-
-The analysis notebook should document the data source, preprocessing, package versions, random seed, gene-set collection, permutation count, and output filenames.
+- Examine and verify the mapping between clinical metadata and gene-expression samples.
+- Explore the gene-expression dataset and its clinical variables.
+- Rank genes by their association with recorded survival duration using Spearman correlation.
+- Perform preranked gene-set enrichment analysis to identify biological processes associated with the ranked gene list.
+- Examine pathway-enrichment results under a protein-coding gene sensitivity analysis, where applicable.
 
 ## Data Source
 
-Gene Expression Omnibus (GEO), accession GSE149009. Add the verified original dataset citation before public release.
+**Dataset:** GSE149009  
+**Repository:** [NCBI Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE149009)
+
+The original dataset contains gene-expression profiles from glioblastoma samples alongside associated clinical information. The original study should be cited when using these data.
+
+## Repository Structure
+
+```text
+gbm-survival-pathway-analysis/
+├── README.md
+├── 01_verify_sample_mapping.py
+├── 02_expression_eda.py
+├── GSE149009_Exploratory_Analysis.ipynb
+├── GSE149009_Survival_Analysis.ipynb
+├── GSE14909_Pathway_Analysis.ipynb
+├── 01_full_gene_survival_rankings_30617.csv
+├── 02_prerank_all_Ensembl_IDs.csv
+├── 05_GO_Biological_Process_prerank_REBUILT.csv
+├── 06_significant_GO_pathways_FDR05.csv
+├── top_negative_pathways.jpeg
+└── top_postive_pathways.jpeg
+```
+
+## Methods
+
+### 1. Sample Mapping and Exploratory Analysis
+
+Sample-mapping checks and exploratory analyses were used to examine the correspondence between clinical metadata and expression samples, as well as the structure and characteristics of the dataset.
+
+### 2. Gene-Level Association Analysis
+
+Spearman rank correlation was used to assess associations between gene-expression measurements and recorded survival duration. Multiple-testing correction was applied to account for the large number of genes tested.
+
+### 3. Pathway Enrichment Analysis
+
+Genes were ranked by their association statistics and analysed using preranked gene-set enrichment analysis with the GO Biological Process 2023 gene-set collection and GSEApy.
+
+Pathway-level enrichment was evaluated using normalized enrichment scores (NES) and false discovery rate (FDR)-adjusted values.
+
+### 4. Sensitivity Analysis
+
+A protein-coding gene analysis was conducted to examine whether pathway-level patterns were broadly consistent when the gene ranking was restricted to protein-coding genes. The final manuscript should specify the exact filtering and identifier-mapping procedures used.
+
+## Main Analysis Outputs
+
+- `01_full_gene_survival_rankings_30617.csv`: gene-level association rankings.
+- `02_prerank_all_Ensembl_IDs.csv`: ranked gene list used for pathway analysis.
+- `05_GO_Biological_Process_prerank_REBUILT.csv`: rebuilt GO Biological Process enrichment results.
+- `06_significant_GO_pathways_FDR05.csv`: pathway results meeting the specified FDR threshold.
+- `top_negative_pathways.jpeg`: visualization of negatively enriched pathways.
+- `top_postive_pathways.jpeg`: visualization of positively enriched pathways.
+
+The exact relationship between the rebuilt enrichment results, the significant-pathway table, and the figures should be checked against the final manuscript before publication.
+
+## Limitations
+
+This analysis examines associations with recorded survival duration and should not be interpreted as demonstrating causation or establishing a validated prognostic biomarker.
+
+The available clinical table contains missing survival-duration values and does not include a verified event/censoring indicator. Therefore, the analysis should not be described as a formal censored-survival analysis unless the required outcome information is independently verified.
+
+Other limitations include potential effects of sample mapping, expression preprocessing, gene identifier mapping, duplicate gene symbols, and tied ranking statistics. Independent validation is required before drawing clinical conclusions.
+
+## Reproducibility
+
+Analysis scripts, notebooks, and derived result tables are provided in this repository to document the computational workflow.
+
+Software versions, preprocessing choices, input-file requirements, and execution instructions should be recorded in the notebooks or accompanying documentation before publication.
+
+The original expression data are available from GEO using the accession above.
+
+## Citation
+
+The original dataset is associated with the following publication:
+
+Yanovich-Arad, G., et al. (2021). *Proteogenomics of glioblastoma associates molecular patterns with survival*. Cell Reports, 34(9), 108787. https://doi.org/10.1016/j.celrep.2021.108787
+
+If this repository is used in future work, please cite the original study and the associated manuscript when a stable citation becomes available.
